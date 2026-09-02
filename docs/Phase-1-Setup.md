@@ -66,6 +66,10 @@ Phase 1 was completed successfully. The development environment was configured, 
 - Hardware troubleshooting
 - USB power-versus-data diagnosis
 
+## Prototype Photograph
+
+![ESP32 microcontroller connected through USB](../images/phase-1/esp32-usb-connection.jpeg)
+
 ## Next Phase
 
 The next phase tests an OLED display independently through the I2C communication protocol.
