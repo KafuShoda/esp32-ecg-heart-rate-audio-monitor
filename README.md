@@ -31,8 +31,11 @@ The project combines embedded programming, digital communication protocols, bios
 - [x] Gather project components
 - [x] Install and configure the development environment
 - [x] Test code compilation and upload
-- [x] Test the OLED display
-- [x] Detect the OLED at I2C address 0x3D
+- [x] Solder and inspect OLED header pins
+- [x] Measure OLED supply voltage
+- [x] Detect OLED at I2C address 0x3D
+- [x] Reassign OLED I2C communication to A2/A3
+- [x] Display Hello World on the OLED
 - [x] Establish basic MAX30003 SPI communication
 - [ ] Configure continuous ECG acquisition
 - [ ] Obtain a stable ECG waveform
@@ -48,9 +51,15 @@ The project combines embedded programming, digital communication protocols, bios
 
 Configured the ESP32-based microcontroller development environment and verified successful code compilation and uploading with a Blink test.
 
+[View the complete Phase 1 documentation](docs/phase-1-Setup.md)
+
 ### Phase 2: OLED Test
 
-Connected the OLED through I2C, detected it at address 0x3D, and displayed “Hello World.”
+### Phase 2: OLED Assembly and Display Test
+
+Soldered the OLED header pins, verified the supply voltage, tested I2C communication, and detected the OLED at address `0x3D`. During troubleshooting, the I2C connection was reassigned from the original A4/A5 path to the working A2/A3 pins.
+
+[View the complete Phase 2 documentation](docs/phase-2-oled-test.md)
 
 ### Phase 3: MAX30003 Communication Test
 
