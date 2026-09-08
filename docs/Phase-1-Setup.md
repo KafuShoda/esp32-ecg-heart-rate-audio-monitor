@@ -68,6 +68,8 @@ Phase 1 was completed successfully. The development environment was configured, 
 
 ## Prototype Photograph
 
+![ESP32 microcontroller alone](../images/phase-1/esp32-alone.jpeg)
+
 ![ESP32 microcontroller connected through USB](../images/phase-1/esp32-usb-connection.jpeg)
 
 ## Next Phase
