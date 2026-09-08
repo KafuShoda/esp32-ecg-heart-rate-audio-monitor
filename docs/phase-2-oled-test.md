@@ -18,6 +18,10 @@ The objective of Phase 2 was to prepare the OLED module for breadboard use, esta
 
 ## Header-Pin Soldering
 
+### Completed Soldering
+
+![OLED header-pin solder joints](../images/phase-2/oled-solder-joints.jpeg)
+
 Male header pins were positioned through the OLED breakout board and soldered into place. The completed joints were visually inspected for alignment, secure connections, and unintended solder bridges.
 
 This provided the mechanical and electrical connections required to use the OLED on a solderless breadboard.
@@ -76,6 +80,10 @@ The program explicitly initialized this pin assignment using:
 
 ## I2C Test Result
 
+### Successful I2C Detection
+
+![Serial Monitor detecting the OLED at 0x3D](../images/phase-2/i2c-address-detected.png)
+
 Using A2 for SDA and A3 for SCL, the I2C scanner successfully reported:
 
 `I2C device found at address 0x3D`
@@ -87,6 +95,10 @@ The fault was isolated to the original A4/A5 connection path, which may involve 
 ## Display Test
 
 After detecting the OLED at address `0x3D`, an SSD1306 display program was used to display “Hello World.”
+
+### Successful Display Test
+
+![OLED displaying Hello World](../images/phase-2/oled-hello-world.jpeg)
 
 ## Skills Practiced
 
