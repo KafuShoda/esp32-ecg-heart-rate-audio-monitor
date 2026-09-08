@@ -20,7 +20,7 @@ The objective of Phase 2 was to prepare the OLED module for breadboard use, esta
 
 ### Completed Soldering
 
-![OLED header-pin solder joints](../images/phase-2/oled-solder-joints.jpeg)
+![OLED header-pin solder joints](../images/phase-2/oled-solder-joint.jpg) 
 
 Male header pins were positioned through the OLED breakout board and soldered into place. The completed joints were visually inspected for alignment, secure connections, and unintended solder bridges.
 
