@@ -51,9 +51,7 @@ The project combines embedded programming, digital communication protocols, bios
 
 Configured the ESP32-based microcontroller development environment and verified successful code compilation and uploading with a Blink test.
 
-[View the complete Phase 1 documentation](docs/phase-1-Setup.md)
-
-### Phase 2: OLED Test
+[View the complete Phase 1 documentation](docs/phase-1-setup.md)
 
 ### Phase 2: OLED Assembly and Display Test
 
