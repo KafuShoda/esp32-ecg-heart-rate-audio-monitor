@@ -1,145 +1,115 @@
-# Phase 2: OLED Header Assembly and Display Test
+# Phase 2: OLED Assembly and Display Testing
 
 ## Objective
 
-The objective of Phase 2 was to prepare the OLED module for breadboard use, connect it to the ESP32-based microcontroller through I2C, identify its address, and verify that it could display text successfully.
+The objective of Phase 2 was to prepare the OLED module for breadboard use, establish I2C communication with the ESP32-based microcontroller, and verify that the display could show text.
 
-## Hardware and Tools Used
+## Hardware and Tools
 
-- ESP32-based Nano microcontroller board
-- Adafruit 1.3-inch 128x64 OLED display
+- Arduino Nano ESP32
+- Adafruit Monochrome 1.3-inch 128x64 OLED, Product ID 938
 - Male header pins
-- Soldering iron
-- Solder
-- Soldering stand and tip-cleaning material
+- Soldering iron and solder
 - Breadboard
 - Jumper wires
+- Digital multimeter
 - USB-C data cable
-- Computer running Arduino IDE
+- Arduino IDE
 
-## OLED Header-Pin Soldering
+## Header-Pin Soldering
 
-The OLED required header pins before it could be installed securely on the breadboard. Male header pins were positioned through the OLED breakout board and soldered into place.
+Male header pins were positioned through the OLED breakout board and soldered into place. The completed joints were visually inspected for alignment, secure connections, and unintended solder bridges.
 
-The assembly process included:
+This provided the mechanical and electrical connections required to use the OLED on a solderless breadboard.
 
-1. Positioning the header pins through the OLED breakout board
-2. Keeping the header straight and aligned
-3. Stabilizing the OLED and header during soldering
-4. Heating each header-pin and PCB-pad connection
-5. Applying solder to form an electrical and mechanical connection
-6. Allowing each joint to cool without moving the pin
-7. Inspecting the completed solder joints
-8. Checking for unintended solder bridges between adjacent pins
-9. Confirming that the header fit securely into the breadboard
+## OLED Controller and Libraries
 
-The OLED was disconnected from power during soldering.
+The Adafruit Product 938 display uses an SSD1306 controller.
 
-## Solder-Joint Inspection
+The following libraries were used:
 
-The completed assembly was visually inspected for:
-
-- Secure solder surrounding each header pin
-- Straight and aligned header pins
-- Separation between neighboring solder joints
-- Absence of visible solder bridges
-- Absence of loose pins
-- Secure installation on the breadboard
-
-Successful operation of the OLED provided additional functional evidence that its power and communication connections were working.
-
-## Communication Protocol
-
-The OLED communicates with the microcontroller using I2C.
-
-I2C uses two primary signal lines:
-
-- SDA carries data between the devices
-- SCL provides the communication clock
-
-The OLED and microcontroller must also share power and ground connections.
-
-## Wiring
-
-| OLED pin | Microcontroller connection |
-|---|---|
-| VIN | 3.3V |
-| GND | GND |
-| SDA | SDA/A4 |
-| SCL | SCL/A5 |
-
-The physical pin labels and breadboard connections were inspected before USB power was connected.
-
-## Required Libraries
-
-The following libraries were installed through the Arduino IDE Library Manager:
-
+- Adafruit SSD1306
 - Adafruit GFX Library
-- Adafruit SH110X
+- Wire
 
-These libraries provide the functions needed to initialize the OLED and display text or graphics.
+## Initial Wiring
 
-## I2C Address Test
+The original test used the Nano ESP32's default I2C pins:
 
-An I2C scanner program was uploaded to the microcontroller. The scanner searched the I2C bus for connected devices.
+| OLED | Original Nano connection |
+|---|---|
+| GND | GND |
+| VIN | 3.3V |
+| Data | A4/SDA |
+| Clk | A5/SCL |
 
-The OLED was detected at:
+The OLED initially worked in this configuration, but later I2C scans did not detect the display.
 
-`0x3D`
+## Troubleshooting
 
-This confirmed that the microcontroller could communicate with the OLED over the I2C bus.
+The following troubleshooting steps were performed:
 
-## Hello World Test
+1. Rechecked the OLED power and I2C wiring
+2. Tested different jumper connections
+3. Tested the circuit on another breadboard
+4. Tested a replacement OLED
+5. Measured approximately 3.26V between OLED VIN and GND
+6. Tested both possible I2C addresses, 0x3C and 0x3D
+7. Reassigned the I2C bus to different Nano ESP32 pins
 
-After identifying the correct I2C address, a separate display-test program was uploaded.
+The correct supply voltage showed that the OLED was receiving power. However, no acknowledgment was received through the original A4/A5 connection path.
 
-The program:
+## Final Working Wiring
 
-1. Initialized the OLED at address `0x3D`
-2. Cleared the display buffer
-3. Selected the text size and color
-4. Wrote `Hello World` to the display buffer
-5. Sent the buffer to the OLED
+The I2C bus was reassigned to A2 and A3:
 
-The message appeared successfully on the display.
+| OLED | Final Nano connection |
+|---|---|
+| GND | GND |
+| VIN | 3.3V |
+| Data/SDA | A2 |
+| Clk/SCL | A3 |
 
-## Result
+The program explicitly initialized this pin assignment using:
 
-Phase 2 was completed successfully. Header pins were soldered onto the OLED breakout board, and the completed joints were visually inspected before the module was installed on the breadboard.
+`Wire.begin(A2, A3);`
 
-The OLED was then detected at I2C address `0x3D` and successfully displayed `Hello World`.
+## I2C Test Result
 
-This confirmed:
+Using A2 for SDA and A3 for SCL, the I2C scanner successfully reported:
 
-- Successful header-pin assembly
-- Secure breadboard installation
-- OLED power and ground connections
-- SDA and SCL connections
-- Correct I2C address
-- Required software-library configuration
-- Successful microcontroller-to-display communication
+`I2C device found at address 0x3D`
+
+This confirmed that the OLED, its soldered connections, power supply, I2C controller, and Nano ESP32 communication system were operational.
+
+The fault was isolated to the original A4/A5 connection path, which may involve the physical pins, breadboard contacts, or original pin configuration.
+
+## Display Test
+
+After detecting the OLED at address `0x3D`, an SSD1306 display program was used to display “Hello World.”
 
 ## Skills Practiced
 
 - Through-hole header-pin soldering
 - Solder-joint inspection
-- Header alignment
-- Breadboard assembly
-- I2C communication
+- Breadboard prototyping
+- Voltage measurement with a digital multimeter
 - I2C address scanning
+- Alternative GPIO assignment
 - Embedded display programming
-- Library installation
-- Incremental hardware testing
-- Hardware troubleshooting
+- Systematic hardware fault isolation
+- Technical documentation
 
-## Limitations
+## Result
 
-The solder joints were evaluated through visual inspection and successful operation of the OLED. This test confirmed that the module operated correctly in the current prototype, but it was not a formal manufacturing or reliability qualification.
+Phase 2 established reliable I2C communication using A2 and A3 and identified the OLED at address `0x3D`.
+
+The A2/A3 assignment will be retained in later project programs and wiring documentation.
 
 ## Next Phase
 
-The next phase tests SPI communication between the ESP32-based microcontroller and the MAX30003 ECG breakout board.
+The next phase tests SPI communication between the Nano ESP32 and the MAX30003 ECG breakout board.
 
-## Safety Notice
+## Safety and Limitations
 
-The OLED was disconnected from power during soldering and physical wiring changes. This project is intended for education and engineering experimentation and is not a certified medical device.
+The system was disconnected from power before wiring changes were made. This project is intended for education and engineering experimentation and is not a certified medical device.
