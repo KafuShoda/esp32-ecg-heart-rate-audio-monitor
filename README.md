@@ -59,9 +59,11 @@ Soldered the OLED header pins, verified the supply voltage, tested I2C communica
 
 [View the complete Phase 2 documentation](docs/phase-2-oled-test.md)
 
-### Phase 3: MAX30003 Communication Test
+### Phase 3: MAX30003 SPI Communication Test
 
-Connected the MAX30003 through SPI and confirmed basic communication by reading a device register.
+Connected the ProtoCentral MAX30003 ECG breakout v3 through SPI and successfully read its INFO register, confirming basic digital communication with the ESP32-based microcontroller.
+
+[View the complete Phase 3 documentation](docs/phase-3-max30003-test.md)
 
 ## Current Status
 
