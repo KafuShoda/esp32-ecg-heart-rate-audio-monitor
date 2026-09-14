@@ -85,6 +85,12 @@ This close-up documents the power, ground, SPI, chip-select, and interrupt conne
 
 The three-lead cable connects to the MAX30003 through its 3.5 mm electrode jack.
 
+## Electrode Placement
+
+![Three-electrode placement](../images/phase-4/phase-4-electrode-placement.jpeg)
+
+Three-electrode configuration used during ECG acquisition. The red and yellow leads provided the differential signal, while the green reference lead helped reduce common electrical noise.
+
 ## Raw ECG Result
 
 ![Raw ECG waveform](../images/phase-4/phase-4-raw-ecg-waveform.png)
