@@ -67,9 +67,15 @@ A reasonable initial result should meet the following conditions:
 
 ## Current Result
 
-The Phase 5 sketch has been prepared and the project is ready for repeated heart-rate testing.
+The MAX30003 successfully detected heartbeats and produced BPM and R–R interval measurements. Five trials were compared with the pulse-rate measurement from a Zacurate Pro Series 500DL fingertip pulse oximeter. The comparison was performed as an informal engineering test and not as medical validation.
 
-Final readings and comparison results will be added after testing is complete.
+## Test Evidence
+
+![Stable BPM and R-R readings](../images/phase-5/phase-5-bpm-serial-monitor-stable.png)
+
+![Comparison with fingertip pulse oximeter](../images/phase-5/phase-5-bpm-comparison.jpeg)
+
+![Five-trial testing notes](../images/phase-5/phase-5-testing-notes.jpeg)
 
 ## Planned Comparison Test
 
@@ -77,13 +83,13 @@ The MAX30003 BPM will be compared with the pulse-rate reading from a consumer fi
 
 The pulse oximeter's `PR` or `BPM` measurement will be used. The oxygen-saturation value (`SpO2%`) will not be used for the heart-rate comparison.
 
-| Trial | MAX30003 BPM | Oximeter PR/BPM | Absolute Difference |
+| Trial | MAX30003 BPM | Oximeter Zacurate PR/BPM | Absolute Difference |
 |---|---:|---:|---:|
-| 1 | Pending | Pending | Pending |
-| 2 | Pending | Pending | Pending |
-| 3 | Pending | Pending | Pending |
-| 4 | Pending | Pending | Pending |
-| 5 | Pending | Pending | Pending |
+| 1 | 70 | 73 | 3 |
+| 2 | 73 | 78 | 5 |
+| 3 | 72 | 72 | 0 |
+| 4 | 75 | 72 | 3 |
+| 5 | 79 | 77 | 2 |
 
 The absolute difference will be calculated using:
 
@@ -91,10 +97,10 @@ The absolute difference will be calculated using:
 
 ## Evidence to Add
 
-- [ ] Screenshot of stable BPM and R–R interval readings
-- [ ] Photograph of the pulse-oximeter comparison
-- [ ] Results from five comparison trials
-- [ ] Photograph or digital copy of the testing notes
+- [x] Screenshot of stable BPM and R–R interval readings
+- [x] Photograph of the pulse-oximeter comparison
+- [x] Results from five comparison trials
+- [x] Photograph or digital copy of the testing notes
 - [x] Exact Phase 5 test sketch
 
 ## Skills Practiced
