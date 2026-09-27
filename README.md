@@ -37,13 +37,23 @@ The project combines embedded programming, digital communication protocols, bios
 - [x] Reassign OLED I2C communication to A2/A3
 - [x] Display Hello World on the OLED
 - [x] Establish basic MAX30003 SPI communication
-- [ ] Configure continuous ECG acquisition
-- [ ] Obtain a stable ECG waveform
-- [ ] Calculate heart rate
-- [ ] Integrate the OLED and ECG board
-- [ ] Test the audio module
-- [ ] Implement heart-rate zone logic
-- [ ] Build a portable prototype
+- [x] Configure continuous ECG acquisition
+- [x] Obtain a repeating ECG waveform
+- [x] Calculate heart rate and R-R interval
+- [x] Compare heart-rate readings with a fingertip pulse oximeter
+- [x] Integrate the OLED and MAX30003
+- [x] Display live BPM and R-R interval on the OLED
+- [x] Add an OLED acquiring state
+- [ ] Add signal-quality and electrode-disconnection handling
+- [ ] Test the DFPlayer Mini audio module
+- [ ] Test earbud output and safe volume
+- [ ] Implement heart-rate zone logic and timers
+- [ ] Add randomized audio prompts
+- [ ] Integrate the complete breadboard system
+- [ ] Perform failure-condition testing
+- [ ] Perform battery-powered testing
+- [ ] Build a portable perfboard prototype
+- [ ] Design an optional custom PCB
 
 ## Development Phases
 
@@ -65,9 +75,33 @@ Connected the ProtoCentral MAX30003 ECG breakout v3 through SPI and successfully
 
 [View the complete Phase 3 documentation](docs/phase-3-max30003-test.md)
 
+### Phase 4: Raw ECG Acquisition
+
+Configured the MAX30003 for continuous ECG acquisition and connected a three-electrode sensor cable. Raw ECG samples were displayed in Serial Plotter, producing a repeating waveform with identifiable heartbeat-related peaks. This phase confirmed that the system could acquire a body-connected biosignal rather than only communicate with the sensor digitally.
+
+[View the complete Phase 4 documentation](docs/phase-4-raw-ecg.md)
+
+### Phase 5: Heart-Rate and R-R Interval Measurement
+
+Used the MAX30003 heartbeat data to measure R-R intervals and calculate heart rate in beats per minute. Live BPM and R-R values were displayed in Serial Monitor and informally compared with the pulse-rate reading from a Zacurate Pro Series 500DL fingertip pulse oximeter.
+
+[View the complete Phase 5 documentation](docs/phase-5-heart-rate.md)
+
+### Phase 6: OLED Heart-Rate Integration
+
+Integrated the MAX30003 heart-rate measurements with the OLED. The display shows live BPM, R-R interval, and an acquiring state while the system waits for an estimate. The OLED is refreshed once per second while heartbeat processing continues in the main program loop.
+
+[View the complete Phase 6 documentation](docs/phase-6-oled-heart-rate.md)
+
 ## Current Status
 
-The OLED has been tested successfully, and basic communication with the MAX30003 has been established. The next objective is to acquire and verify a stable ECG waveform.
+The ESP32-based microcontroller successfully communicates with the MAX30003 ECG sensor through SPI and with the OLED through I2C. The system can acquire raw ECG samples, display a repeating waveform, calculate BPM and R-R intervals, and show the resulting estimates on both Serial Monitor and the OLED.
+
+The OLED displays an acquiring screen before a plausible BPM estimate becomes available and refreshes approximately once per second without interrupting heartbeat processing.
+
+Disconnected electrodes can still collect electrical noise that may be mistaken for heartbeats. The next phase will add signal-quality checks, electrode-disconnection handling, and protection against unreliable readings triggering future audio prompts.
+
+This remains an experimental engineering prototype and is not a medical device.
 
 ## Safety and Limitations
 
