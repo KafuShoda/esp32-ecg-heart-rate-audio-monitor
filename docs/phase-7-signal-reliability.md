@@ -13,7 +13,7 @@ measurements cannot activate future heart-rate-zone audio prompts.
 
 - [x] Test 1: Stationary raw ECG baseline
 - [x] Test 2: Ten-minute raw-sample continuity
-- [ ] Test 3: Ten-minute stationary BPM reliability
+- [x] Test 3: Complete ten-minute stationary BPM and OLED reliability test
 - [ ] Test 4: Electrode disconnection and recovery
 - [ ] Test 5: Implement signal-quality protection
 - [ ] Test 6: Verify signal-quality protection
@@ -152,4 +152,100 @@ Test 2 passed. The MAX30003 and Nano ESP32 maintained continuous raw ECG
 sample acquisition at approximately 125 samples per second for the full
 ten-minute documented period.
 
+## Test 3: Ten-Minute Stationary BPM and OLED Reliability
+
+### Objective
+
+The objective was to determine whether continuous raw ECG acquisition
+could produce stable BPM and R–R estimates for ten minutes while the
+participant remained seated and stationary.
+
+The test also checked whether the Serial Monitor and OLED continued
+updating without freezing or unexpectedly restarting.
+
+### Test Configuration
+
+- Microcontroller: Arduino Nano ESP32
+- ECG sensor: ProtoCentral MAX30003
+- Display: 128 × 64 OLED at I2C address `0x3D`
+- OLED pins: A2 for SDA and A3 for SCL
+- MAX30003 chip-select pin: D10
+- Serial speed: 115200 baud
+- Electrode condition: All three electrodes connected
+- Test condition: Seated and stationary
+- Test duration: 10 minutes
+
+### Method
+
+The Phase 6 heart-rate and OLED sketch was copied into a separate Phase
+7 test folder and uploaded to the Nano ESP32.
+
+After all three electrodes were connected, the system was allowed to
+acquire a plausible heart-rate estimate. The participant then remained
+seated and stationary for ten minutes.
+
+Serial Monitor evidence was recorded at approximately 1, 5, and 10
+minutes. The output was checked for plausible BPM values, corresponding
+R–R intervals, continued updates, signal-loss messages, freezes, and
+unexpected restarts.
+
+### Results
+
+| Checkpoint | Visible BPM range | Visible R–R range | Last visible reading | Result |
+|---:|---:|---:|---:|---|
+| 1 minute | 79–86 BPM | 695–757 ms | 86 BPM / 695 ms | Stable |
+| 5 minutes | 78–83 BPM | 718–765 ms | 78 BPM / 765 ms | Stable |
+| 10 minutes | 71–82 BPM | 726–835 ms | 78 BPM / 765 ms | Stable |
+
+All documented BPM and R–R pairs were internally consistent with the
+approximate relationship:
+
+\[
+\text{BPM} \approx \frac{60{,}000}{\text{R–R interval in milliseconds}}
+\]
+
+For example, an R–R interval of 765 ms corresponds to approximately
+78.4 BPM, which agrees with the displayed value of 78 BPM.
+
+No extreme BPM spikes, `No plausible reading` messages, permanent
+output freezes, or unexpected restarts were visible in the documented
+checkpoints.
+
+### Evidence
+
+#### One-minute checkpoint
+
+![Stationary BPM at one minute](../images/phase-7/phase-7-06-bpm-1-minute.png)
+
+The one-minute checkpoint showed continuous readings between
+approximately 79 and 86 BPM with corresponding R–R intervals.
+
+#### Five-minute checkpoint
+
+![Stationary BPM at five minutes](../images/phase-7/phase-7-07-bpm-5-minutes.png)
+
+The five-minute checkpoint showed a stable group of readings between
+approximately 78 and 83 BPM.
+
+#### Ten-minute checkpoint
+
+![Stationary BPM at ten minutes](../images/phase-7/phase-7-08-bpm-10-minutes.png)
+
+The ten-minute checkpoint confirmed that plausible BPM and R–R output
+continued through the end of the test.
+
+### Result
+
+Test 3 passed under stationary conditions.
+
+The MAX30003 continued producing plausible heart-rate estimates through
+the ten-minute test, and the BPM and R–R values remained mathematically
+consistent. The results support short-term stationary reliability but
+do not establish medical accuracy or reliability during walking.
+
+Movement reliability, electrode disconnection behavior, and false-reading
+rejection will be evaluated separately in later Phase 7 tests.
+
+The OLED continued updating throughout the test and did not remain
+permanently frozen on a previous reading.
 
