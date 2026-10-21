@@ -30,3 +30,20 @@ cumulative samples.
 
 Ten-minute checkpoint showing 74,626 cumulative samples with acquisition
 still continuously streaming.
+
+## Test 3: Ten-Minute Stationary BPM and OLED Reliability
+
+### `phase-7-06-bpm-1-minute.png`
+
+One-minute checkpoint showing stable, internally consistent stationary
+BPM and R–R readings.
+
+### `phase-7-07-bpm-5-minutes.png`
+
+Five-minute checkpoint showing continued BPM output without extreme
+spikes or signal-loss messages.
+
+### `phase-7-08-bpm-10-minutes.png`
+
+Ten-minute checkpoint confirming that plausible BPM and R–R output
+continued through the end of the stationary test.
