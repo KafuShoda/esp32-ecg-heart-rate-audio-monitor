@@ -18,12 +18,15 @@ Stationary raw ECG waveform obtained with all three new electrodes connected.
 
 ### `phase-7-03-continuity-1-minute.png`
 
-Serial Monitor checkpoint near the beginning of the raw-sample continuity test.
+One-minute checkpoint showing 125 samples per second, a last-sample age
+of 0 ms, and `STREAMING` status.
 
 ### `phase-7-04-continuity-5-minutes.png`
 
-Serial Monitor checkpoint near the middle of the raw-sample continuity test.
+Five-minute checkpoint showing continued acquisition and 37,126
+cumulative samples.
 
 ### `phase-7-05-continuity-10-minutes.png`
 
-Serial Monitor checkpoint at the completion of the ten-minute continuity test.
+Ten-minute checkpoint showing 74,626 cumulative samples with acquisition
+still continuously streaming.
