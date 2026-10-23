@@ -14,7 +14,7 @@ measurements cannot activate future heart-rate-zone audio prompts.
 - [x] Test 1: Stationary raw ECG baseline
 - [x] Test 2: Ten-minute raw-sample continuity
 - [x] Test 3: Complete ten-minute stationary BPM and OLED reliability test
-- [ ] Test 4: Electrode disconnection and recovery
+- [x] Test 4: Electrode disconnection and recovery
 - [ ] Test 5: Implement signal-quality protection
 - [ ] Test 6: Verify signal-quality protection
 - [ ] Test 7: Controlled movement testing
