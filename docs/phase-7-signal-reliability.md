@@ -249,3 +249,215 @@ rejection will be evaluated separately in later Phase 7 tests.
 The OLED continued updating throughout the test and did not remain
 permanently frozen on a previous reading.
 
+## Test 4: Electrode Disconnection and Recovery
+
+### Objective
+
+The objective was to characterize how the prototype responds when each
+electrode lead is disconnected individually and when all three leads are
+disconnected together.
+
+The test evaluated:
+
+- Whether the system recognized signal loss
+- Whether disconnected leads produced false BPM estimates
+- Whether the OLED and Serial Monitor continued updating
+- How long reacquisition required after reconnection
+- Whether the system recovered without a manual reset
+
+This was a characterization test. It did not assume that plausible-looking
+BPM values obtained with a disconnected electrode represented a valid
+heart-rate measurement.
+
+### Test Configuration
+
+- Microcontroller: Arduino Nano ESP32
+- ECG sensor: ProtoCentral MAX30003
+- Display: 128 × 64 OLED at I2C address `0x3D`
+- OLED pins: A2 for SDA and A3 for SCL
+- MAX30003 chip-select pin: D10
+- Serial speed: 115200 baud
+- Tested sketch:
+  `code/phase-7-stationary-bpm/phase-7-stationary-bpm.ino`
+- Test condition: Seated and stationary
+- Power condition: Laptop operating from battery power
+- Audio module: Not active
+- Number of trials: Two
+
+### Method
+
+Each trial began with all three electrodes attached. The system was
+allowed to acquire stable BPM and R–R readings before disconnection
+testing began.
+
+The red, yellow, and green leads were then disconnected individually.
+For each lead:
+
+1. The other two leads remained attached.
+2. Output behavior was observed while the lead remained disconnected.
+3. BPM, R–R, acquiring messages, rejected readings, and artifacts were
+   recorded.
+4. The lead was reconnected.
+5. The time required to return to stable output was recorded.
+
+After the individual-lead tests, all three leads were disconnected
+together for 60 seconds. All three were then reattached, and final
+reacquisition time was recorded.
+
+The Nano ESP32 was not intentionally reset between conditions.
+
+## Trial 1
+
+### Trial 1 Results
+
+| Condition | Behavior while disconnected | Recovery after reconnection |
+|---|---|---:|
+| All three connected | Normal and stable BPM and R–R readings | N/A |
+| Red disconnected | No visible interruption, pause, or acquiring period | Immediate; no measurable delay |
+| Yellow disconnected | The system required approximately 50 seconds to produce readings. During the first five minutes, brief extreme readings or a single `No plausible reading` message appeared approximately every 30 seconds. The output appeared more stable after five minutes. | Approximately 38 seconds |
+| Green disconnected | `No plausible reading` continued for approximately 4 minutes 20 seconds. Output briefly appeared stable around 4 minutes 40 seconds. Minutes 5–6 were highly unstable. During minutes 7–10, readings were mostly in the 70–80 BPM range but were interrupted approximately every 20 seconds by an extreme value or `No plausible reading`. | Approximately 20 seconds |
+| All three disconnected | `No plausible reading` throughout the complete 60-second observation | Approximately 110 seconds |
+
+### Trial 1 Observations
+
+Disconnecting the red lead produced no obvious sustained effect.
+Disconnecting the yellow lead produced temporary signal loss followed by
+intermittent artifacts. Disconnecting the green lead caused the most
+severe degradation and produced delayed periods of apparently normal
+but intermittently unstable output.
+
+Disconnecting all three leads caused the program to reject the signal for
+the complete 60-second observation. After all three leads were
+reattached, the system recovered without a reset, although reacquisition
+required approximately 110 seconds.
+
+## Trial 2
+
+### Trial 2 Results
+
+Initial acquisition with all three electrodes attached required
+approximately three minutes. Once acquired, BPM and R–R readings remained
+normal and stable for approximately three to four minutes.
+
+| Condition | Behavior while disconnected | Recovery after reconnection |
+|---|---|---:|
+| All three connected | Stable BPM and R–R after approximately three minutes of initial acquisition | N/A |
+| Red disconnected | Readings remained stable for three minutes, except for approximately three seconds of abnormal values immediately after disconnection | Effectively immediate; one abnormal low reading appeared for one second after reconnection |
+| Yellow disconnected | At 10 seconds the program displayed `No plausible reading`. At 30 seconds it displayed 45 BPM/1328 ms; at 60 seconds, 84 BPM/710 ms; at two minutes, 80 BPM/750 ms; and at three minutes, 88 BPM/679 ms. | `No plausible reading` for approximately 30 seconds, followed by approximately 10 seconds of unreliable readings; reliable output returned after approximately 40 seconds |
+| Green disconnected | `No plausible reading` continued for approximately 12 minutes. Scattered BPM estimates appeared during minutes 13–14. During minutes 14–16, readings appeared mostly stable around 75–85 BPM but were interrupted approximately every 20 seconds by an extreme value or `No plausible reading`. | Approximately 30 seconds |
+| All three disconnected | `No plausible reading` throughout the complete 60-second observation | Approximately 105 seconds |
+
+### Trial 2 Observations
+
+Trial 2 reproduced the major behavior observed during Trial 1. Removing
+red caused almost no sustained change. Removing yellow initially
+disrupted acquisition but eventually produced plausible-looking BPM and
+R–R values despite the lead remaining disconnected. Removing green
+caused the longest and most severe degradation.
+
+The apparently stable values produced with yellow or green disconnected
+were not considered verified heart-rate measurements. Their occurrence
+demonstrated that numerical plausibility and mathematical consistency
+between BPM and R–R were not sufficient to establish signal quality.
+
+The all-leads-off result closely reproduced Trial 1. The program rejected
+the signal for the full 60 seconds, and final reacquisition required 105
+seconds compared with 110 seconds during Trial 1.
+
+## Comparison Between Trials
+
+| Finding | Trial 1 | Trial 2 | Interpretation |
+|---|---:|---:|---|
+| Red disconnected | No sustained effect | Only brief transition artifacts | Red disconnection was not reliably identified |
+| Yellow reconnected | 38-second recovery | Approximately 40-second recovery | Highly repeatable recovery behavior |
+| Green disconnected | Delayed, intermittent false stability | Longer delay followed by intermittent false stability | Same failure pattern with variable timing |
+| Green reconnected | 20-second recovery | 30-second recovery | Recovery occurred without a reset |
+| All leads disconnected | No plausible reading for 60 seconds | No plausible reading for 60 seconds | Highly repeatable rejection behavior |
+| All leads reconnected | 110-second recovery | 105-second recovery | Highly repeatable recovery time |
+
+## Analysis
+
+The two trials produced consistent qualitative results despite
+differences in exact timing.
+
+### Red-Lead Disconnection
+
+Red-lead disconnection was not reliably identified. The system continued
+producing stable-looking BPM and R–R output with almost no interruption.
+This does not prove that the red lead was defective or unnecessary. It
+only demonstrates that the current software continued producing
+estimates using the remaining connections.
+
+### Yellow-Lead Disconnection
+
+Yellow-lead disconnection initially disrupted acquisition but later
+produced plausible-looking BPM and R–R estimates.
+
+For example, Trial 2 produced:
+
+- 45 BPM with an R–R interval of 1328 ms
+- 84 BPM with an R–R interval of 710 ms
+- 80 BPM with an R–R interval of 750 ms
+- 88 BPM with an R–R interval of 679 ms
+
+These pairs were mathematically consistent, but they could not be
+considered verified because the yellow lead remained disconnected. This
+demonstrated that agreement between BPM and R–R does not independently
+confirm ECG signal quality.
+
+### Green-Lead Disconnection
+
+Green-lead disconnection caused the strongest and longest degradation.
+Both trials eventually produced periods of plausible-looking output, but
+those periods continued to be interrupted by extreme or rejected
+readings.
+
+This behavior was classified as false or unverified stability. The large
+difference between the two trials' timing also demonstrated that a fixed
+waiting period cannot determine whether the signal has become reliable.
+
+### All-Leads-Off Behavior
+
+When all three leads were disconnected, the program displayed
+`No plausible reading` throughout both 60-second observations. This was
+the desired visible behavior.
+
+After all three leads were reattached, reacquisition required 110 seconds
+during Trial 1 and 105 seconds during Trial 2. The close agreement
+demonstrated repeatable recovery behavior.
+
+However, the existing sketch used broad BPM and R–R plausibility limits.
+The test did not establish that the software positively detected physical
+electrode disconnection.
+
+## Test 4 Result
+
+Test 4 successfully characterized electrode-disconnection and recovery
+behavior across two trials.
+
+The hardware remained operational and eventually recovered from every
+tested condition without an intentional manual reset. However, the
+software did not reliably identify individual lead loss and sometimes
+accepted plausible-looking estimates while an electrode remained
+disconnected.
+
+The results demonstrate that:
+
+- A plausible BPM value does not necessarily indicate a valid ECG signal.
+- Brief connection changes can create extreme transient readings.
+- Individual lead loss is not reliably detected by numerical limits alone.
+- Fixed reacquisition delays cannot guarantee signal validity.
+- Previous BPM values must be cleared when signal quality becomes uncertain.
+- Audio prompts must remain disabled during poor signal and reacquisition.
+- A sustained clean-signal period is required before BPM is accepted.
+
+Signal-quality protection, transient rejection, and a controlled
+reacquisition state will be implemented in Test 5.
+
+This prototype is experimental and is not intended for medical use.
+
+### Evidence Note
+
+Test 4 was documented primarily through timed observations recorded in
+the results tables. Screenshots were not required because each condition
+required continuous monitoring and controlled electrode changes.
