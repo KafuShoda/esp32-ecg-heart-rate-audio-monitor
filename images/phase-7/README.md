@@ -47,3 +47,10 @@ spikes or signal-loss messages.
 
 Ten-minute checkpoint confirming that plausible BPM and R–R output
 continued through the end of the stationary test.
+
+## Test 4: Electrode Disconnection and Recovery
+
+Test 4 was documented through two timed observation trials rather than
+screenshots. Each electrode was disconnected individually, followed by
+an all-leads-off test. Detailed results and recovery times are available
+in `docs/phase-7-signal-reliability.md`.
