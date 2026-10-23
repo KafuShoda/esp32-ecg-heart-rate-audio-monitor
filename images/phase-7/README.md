@@ -51,6 +51,6 @@ continued through the end of the stationary test.
 ## Test 4: Electrode Disconnection and Recovery
 
 Test 4 was documented through two timed observation trials rather than
-screenshots. Each electrode was disconnected individually, followed by
-an all-leads-off test. Detailed results and recovery times are available
-in `docs/phase-7-signal-reliability.md`.
+photographs. The combined results, individual-lead behavior, and recovery
+times are recorded in
+[`docs/phase-7-signal-reliability.md`](../../docs/phase-7-signal-reliability.md).
