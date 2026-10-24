@@ -461,3 +461,162 @@ This prototype is experimental and is not intended for medical use.
 Test 4 was documented primarily through timed observations recorded in
 the results tables. Screenshots were not required because each condition
 required continuous monitoring and controlled electrode changes.
+
+## Test 5: Signal-Quality Protection
+
+### Objective
+
+The objective was to implement a software signal-quality layer that
+prevents questionable BPM estimates from being immediately accepted or
+used by future audio-zone logic.
+
+Test 4 demonstrated that plausible-looking BPM and R–R values could
+occasionally appear while an electrode was disconnected. Test 5
+therefore added explicit signal states, transient rejection, filtering,
+and a controlled reacquisition period.
+
+### Library Configuration
+
+- Library: ProtoCentral MAX30003 ECG AFE Sensor Library
+- Installed version: 2.0.0
+- Update available during testing: No
+- Available examples:
+  - `01-ecg-openview`
+  - `02-ecg-plotter`
+  - `03-hr-rtor`
+
+The installed library did not include a lead-off example. Test 5
+therefore implemented a software quality guard using the existing
+heart-rate and R–R functions.
+
+### Tested Sketch
+
+The tested sketch is available at:
+
+[`code/phase-7-signal-quality/phase-7-signal-quality.ino`](../code/phase-7-signal-quality/phase-7-signal-quality.ino)
+
+### Implemented Protections
+
+The Test 5 sketch added three signal states:
+
+| State | Meaning | OLED behavior | BPM accepted? |
+|---|---|---|:---:|
+| `ACQUIRING` | Waiting for a sustained period of acceptable input | Displays `Acquiring...` and the stability counter | No |
+| `VALID` | Input passed the available checks and qualification period | Displays filtered BPM and R–R | Yes |
+| `POOR_SIGNAL` | An invalid or questionable result was detected | Clears BPM and displays `POOR SIGNAL` | No |
+
+The sketch also added:
+
+- Broad BPM and R–R plausibility limits
+- A BPM/R–R mathematical consistency check
+- Rejection of a one-second BPM change greater than 20 BPM
+- Five-reading median filtering
+- A 30-second clean-signal qualification period
+- Immediate clearing of old BPM values after rejected input
+- Automatic reset of the qualification timer
+- Diagnostic Serial Monitor messages
+- Suppression of future audio activity outside the `VALID` state
+
+The 20 BPM jump limit and 30-second qualification period are experimental
+engineering settings, not medical thresholds.
+
+### Method
+
+The protected sketch was first tested with all electrodes disconnected
+from the body. The system was observed for one minute to determine
+whether it would incorrectly accept a disconnected signal.
+
+All three electrodes were then attached. The time to the first
+`ACQUIRING` message and the time to `VALID` were recorded.
+
+After validation, the system was observed for approximately seven
+minutes while the participant remained seated and stationary.
+
+### Results
+
+| Observation | Result |
+|---|---|
+| Disconnected state | `POOR_SIGNAL` |
+| Incorrectly reached `VALID` while disconnected? | No |
+| Time from connecting electrodes to first `ACQUIRING` message | Approximately 5 seconds |
+| Did the qualification period complete? | Yes; the final visible acquiring count was 29/30, followed by `VALID` |
+| Time from connecting electrodes to `VALID` | Approximately 54 seconds |
+| Raw BPM at initial validation | 87 BPM |
+| Filtered BPM after validation | 86 BPM |
+| Filtered R–R after validation | 695 ms |
+| Did the OLED display `Status: VALID`? | Yes |
+| Later protection events | `POOR_SIGNAL` appeared at approximately 2 minutes and 2 minutes 20 seconds, resetting qualification twice |
+| Longest continuous valid period | Approximately 4 minutes, from minute 3 through minute 7 |
+
+The filtered result was internally consistent:
+
+\[
+60{,}000 \div 695 \approx 86.3\text{ BPM}
+\]
+
+This agrees with the displayed filtered value of approximately 86 BPM.
+
+### Analysis
+
+With all electrodes disconnected, the system remained in
+`POOR_SIGNAL` and did not incorrectly enter `VALID`. This confirmed that
+the protected sketch rejected the completely disconnected condition
+during the initial test.
+
+After all three electrodes were connected, the system entered
+`ACQUIRING` after approximately five seconds and reached `VALID` after
+approximately 54 seconds.
+
+The final visible qualification count was 29/30 because the sketch
+immediately changes to `VALID` when the thirtieth acceptable report is
+received. It does not display a separate 30/30 acquiring screen.
+
+Two later `POOR_SIGNAL` events occurred at approximately 2 minutes and
+2 minutes 20 seconds. These events demonstrated that the protection
+system cleared validation when it encountered questionable input.
+Following those events, the system recovered automatically.
+
+The system then remained continuously `VALID` from approximately minute
+3 through minute 7.
+
+### Limitations
+
+The Test 5 protections are software-based. They improve transient
+rejection and controlled reacquisition but do not prove physical
+electrode attachment.
+
+A sufficiently stable false signal may still pass the numerical and
+timing checks. Red-lead disconnection was especially difficult to
+identify during Test 4.
+
+The sketch therefore cannot yet be considered a replacement for true
+hardware lead-off detection. Individual electrode disconnections will be
+retested with the protected sketch during Test 6.
+
+### Result
+
+Test 5 passed its implementation and initial stationary validation test.
+
+The system:
+
+- Rejected the completely disconnected condition
+- Did not incorrectly enter `VALID` while completely disconnected
+- Required sustained acceptable input before displaying BPM
+- Applied median filtering
+- Rejected questionable input
+- Cleared validation after poor-signal events
+- Recovered automatically without resetting the Nano
+- Maintained approximately four continuous minutes of valid stationary
+  operation
+
+Audio output remained disabled during this test.
+
+### Evidence Note
+
+Test 5 was documented through the tested source code and timed
+observations. No screenshots were retained. The absence of screenshots
+does not affect the recorded functional results because the state
+transitions, qualification timing, filtered output, and continuous-valid
+period were documented during the test.
+
+This prototype is experimental and is not intended for medical use.
