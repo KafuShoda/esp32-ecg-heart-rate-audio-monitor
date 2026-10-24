@@ -54,3 +54,11 @@ Test 4 was documented through two timed observation trials rather than
 photographs. The combined results, individual-lead behavior, and recovery
 times are recorded in
 [`docs/phase-7-signal-reliability.md`](../../docs/phase-7-signal-reliability.md).
+
+## Test 5: Signal-Quality Protection
+
+Test 5 was documented through the tested source code and timed
+observations. No screenshots were retained for this test.
+
+The complete implementation and results are available in
+[`docs/phase-7-signal-reliability.md`](../../docs/phase-7-signal-reliability.md).
