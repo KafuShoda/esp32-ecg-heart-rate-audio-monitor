@@ -11,14 +11,16 @@ measurements cannot activate future heart-rate-zone audio prompts.
 
 ## Test Progress
 
-- [x] Test 1: Stationary raw ECG baseline
-- [x] Test 2: Ten-minute raw-sample continuity
+## Phase 7 Test Checklist
+
+- [x] Test 1: Record stationary raw ECG waveform
+- [x] Test 2: Complete ten-minute raw-sample continuity test
 - [x] Test 3: Complete ten-minute stationary BPM and OLED reliability test
-- [x] Test 4: Electrode disconnection and recovery
-- [ ] Test 5: Implement signal-quality protection
-- [ ] Test 6: Verify signal-quality protection
-- [ ] Test 7: Controlled movement testing
-- [ ] Test 8: Final endurance test
+- [x] Test 4: Test electrode disconnection and recovery
+- [x] Test 5: Implement signal-quality protection
+- [x] Test 6: Verify signal-quality protection
+- [ ] Test 7: Perform controlled movement testing
+- [ ] Test 8: Complete final endurance test
 
 ## Test 1: Stationary Raw ECG Baseline
 
