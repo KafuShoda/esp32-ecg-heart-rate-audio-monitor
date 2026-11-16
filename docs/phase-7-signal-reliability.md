@@ -620,3 +620,370 @@ transitions, qualification timing, filtered output, and continuous-valid
 period were documented during the test.
 
 This prototype is experimental and is not intended for medical use.
+
+## Test 6: Signal-Quality Protection Verification
+
+### Objective
+
+The objective was to verify the software signal-quality protections
+implemented during Test 5.
+
+The protected sketch was tested by disconnecting red, yellow, and green
+individually and then disconnecting all three leads together. The test
+evaluated whether the software:
+
+- Entered `POOR_SIGNAL` when input became questionable
+- Removed the displayed BPM
+- Rejected brief artifacts
+- Prevented disconnected conditions from reaching `VALID`
+- Required a controlled reacquisition period
+- Recovered automatically after reconnection
+- Continued operating without a manual reset
+
+### Test Configuration
+
+- Microcontroller: Arduino Nano ESP32
+- ECG sensor: ProtoCentral MAX30003
+- Display: 128 × 64 OLED at I2C address `0x3D`
+- OLED pins: A2 for SDA and A3 for SCL
+- MAX30003 chip-select pin: D10
+- Serial speed: 115200 baud
+- Test condition: Seated and stationary
+- Audio output: Disabled
+- Laptop power: Battery operation during body-connected testing
+- Signal qualification period: 30 consecutive seconds
+- Median-filter size: Five readings
+- Abrupt-change threshold: 20 BPM
+- Hardware lead-off detection: Not enabled
+
+### Tested Sketch
+
+Test 6 reused the protected Test 5 sketch:
+
+[`code/phase-7-signal-quality/phase-7-signal-quality.ino`](../code/phase-7-signal-quality/phase-7-signal-quality.ino)
+
+No separate Test 6 sketch was required.
+
+### Method
+
+The system was first allowed to reach `VALID` with all three electrodes
+connected.
+
+The red, yellow, and green leads were then disconnected individually.
+For each condition, the OLED and Serial Monitor states were observed,
+including:
+
+- `POOR_SIGNAL`
+- `ACQUIRING`
+- `VALID`
+- Time required to return to `VALID`
+- Whether `VALID` occurred while a lead remained disconnected
+- Any freeze, restart, or prolonged instability
+
+All three leads were also disconnected together for 60 seconds and then
+reattached.
+
+Because the original all-leads recovery test used old electrode pads and
+produced prolonged instability, a stationary confirmation and targeted
+all-leads recovery test were later performed with fresh pads.
+
+### Combined Results
+
+| Condition | Behavior while disconnected | Reached `VALID` while disconnected? | Recovery after reconnection | Result |
+|---|---|:---:|---:|---|
+| Red disconnected | A transient disturbance triggered `ACQUIRING`, but the system returned to `VALID` while red remained disconnected | Yes | Approximately 30 seconds | Transient rejection passed; persistent disconnection detection failed |
+| Yellow disconnected | Initially remained in `ACQUIRING`, but later produced plausible `VALID` readings with yellow still disconnected; additional poor-signal events occurred | Yes | Approximately 1 minute 50 seconds | Transient rejection passed; persistent disconnection detection failed |
+| Green disconnected | Alternated between `POOR_SIGNAL` and short acquiring attempts for ten minutes without reaching `VALID` | No during the ten-minute test | Approximately 1 minute 20 seconds | Passed the ten-minute green-disconnection test |
+| All three disconnected | Immediately entered and remained in `POOR_SIGNAL` for the full 60-second observation | No | Original recovery was unstable; fresh-pad repeat reached `VALID` after approximately 2 minutes 10 seconds | Complete disconnection detection passed |
+| Fresh-pad stationary baseline | All three connected | N/A | Reached `VALID` after approximately 3 minutes 30 seconds | Remained continuously valid for ten minutes |
+| Fresh-pad all-leads repeat | `POOR_SIGNAL` for the full disconnected minute | No | Reached `VALID` approximately 2 minutes 10 seconds after reconnection | Stable overall, with one later brief interruption |
+
+### Red-Lead Verification
+
+#### Initial Attempt
+
+During an initial red-lead attempt, reconnecting red caused the system to
+enter `ACQUIRING` for approximately 30 seconds and then return to
+`VALID`.
+
+After remaining valid for almost one minute, both Serial Monitor and the
+OLED stopped updating. This event was documented as a probable complete
+processing or sensor-acquisition stall.
+
+The red test was subsequently repeated.
+
+#### Repeat Result
+
+During the repeat:
+
+1. Red was disconnected.
+2. The system entered `ACQUIRING`.
+3. It returned to `VALID` after approximately 30 seconds even though red
+   remained disconnected.
+4. Red remained disconnected for approximately three minutes.
+5. Red was reconnected.
+6. The system required another approximately 30-second acquiring period
+   before returning to `VALID`.
+
+During a six-minute post-reconnection observation, two additional
+`POOR_SIGNAL` events occurred:
+
+- Approximately one minute after reconnection
+- Approximately four minutes after reconnection
+
+Each event triggered approximately 30 seconds of reacquisition before
+valid output returned.
+
+The complete freeze observed during the first attempt was not reproduced
+during the repeat.
+
+#### Red-Lead Result
+
+- Transient-artifact rejection: **Pass**
+- Automatic recovery: **Pass**
+- Persistent red-disconnection detection: **Fail**
+- Complete freeze during the repeat: **No**
+
+The protected sketch responded to transition artifacts but could not
+confirm that red remained physically attached.
+
+### Yellow-Lead Verification
+
+Yellow remained disconnected for six minutes.
+
+#### Disconnected Observations
+
+| Time | State | Raw BPM | Filtered BPM | Filtered R–R |
+|---:|---|---:|---:|---:|
+| 0:00–1:15 | `ACQUIRING` | — | — | — |
+| 1:30 | `VALID` | 76 | 82 | 726 ms |
+| 2:00 | `VALID` | 81 | 80 | 750 ms |
+| 3:00 | `VALID` | 79 | 79 | 757 ms |
+| 3:30 | `POOR_SIGNAL`, followed by `ACQUIRING` | — | — | — |
+| 4:00 | `VALID` | 78 | 78 | 765 ms |
+| 4:30 | `POOR_SIGNAL`, followed by `ACQUIRING` | — | — | — |
+| 5:00 | `VALID` | Approximately 83 | 82 | 726 ms |
+| 5:00–6:00 | `VALID` | — | — | — |
+
+A contemporaneous note appeared to show `803.0 BPM` at one checkpoint.
+This was treated as a transcription or display-formatting error because
+the protected sketch rejects raw BPM values above 220. The surrounding
+filtered BPM and R–R values indicated a reading in approximately the low
+80s.
+
+#### Yellow Reconnection
+
+Yellow was reconnected at the six-minute checkpoint.
+
+The system returned to `VALID` at approximately 7 minutes 50 seconds,
+representing a recovery time of approximately 1 minute 50 seconds.
+
+At approximately 7 minutes 55 seconds, the following representative
+values were observed:
+
+- Raw BPM: 84
+- Filtered BPM: Approximately 83
+- Filtered R–R: 718 ms
+
+The system remained continuously `VALID` through the nine-minute
+checkpoint.
+
+At nine minutes, it displayed:
+
+- Raw BPM: 78
+- Filtered BPM: 78
+- Filtered R–R: 765 ms
+
+#### Yellow-Lead Result
+
+- Initial rejection after disconnection: **Pass**
+- Transient-artifact rejection: **Pass**
+- Automatic recovery: **Pass**
+- Persistent yellow-disconnection detection: **Fail**
+- Post-reconnection stability: **Pass**
+- Complete freeze: **No**
+
+The software detected several disturbances but ultimately accepted a
+plausible-looking signal while yellow remained disconnected.
+
+### Green-Lead Verification
+
+Green was disconnected for ten minutes.
+
+During the complete disconnected period, the system alternated between:
+
+- `POOR_SIGNAL`
+- Short `ACQUIRING` attempts lasting approximately 3–7 seconds
+
+No acquiring attempt completed the required qualification period, and
+the system never reached `VALID` during the ten-minute green-off test.
+
+Green was reconnected at the ten-minute checkpoint. The system reached
+`VALID` at approximately 11 minutes 20 seconds, representing a recovery
+time of approximately 1 minute 20 seconds.
+
+It then remained continuously valid through approximately 12 minutes
+45 seconds, providing approximately 1 minute 25 seconds of uninterrupted
+post-reconnection validation.
+
+#### Green-Lead Result
+
+- Ten-minute disconnection rejection: **Pass**
+- Incorrectly reached `VALID` while disconnected: **No**
+- Transient-artifact rejection: **Pass**
+- Recovery after reconnection: **Pass**
+- Short-term post-reconnection stability: **Pass**
+- Complete freeze: **No**
+
+This result establishes successful green-disconnection rejection for the
+ten-minute observation. It does not establish that green disconnection
+would be rejected indefinitely.
+
+### Original All-Leads-Off Test
+
+All three leads were disconnected together.
+
+The system immediately entered `POOR_SIGNAL` and remained there for the
+complete 60-second disconnected observation. It never reached `VALID`.
+
+After all three leads were reattached:
+
+1. The system alternated between `POOR_SIGNAL` and `ACQUIRING`.
+2. It first reached `VALID` after approximately 5 minutes 30 seconds.
+3. That valid period lasted approximately 1 minute 30 seconds.
+4. It then remained continuously in `POOR_SIGNAL` for approximately four
+   minutes.
+5. It subsequently alternated between `POOR_SIGNAL`, `ACQUIRING`, and
+   several short valid periods.
+6. Later valid periods ranged from approximately 5 seconds to one minute.
+7. The longest later valid period lasted approximately 4 minutes
+   30 seconds.
+8. A representative valid reading was approximately:
+   - Raw BPM: 81
+   - Filtered BPM: 81
+   - Filtered R–R: 734 ms
+9. The system eventually returned to `POOR_SIGNAL`, and the test was
+   ended before another recovery completed.
+
+The original recovery was classified as highly unstable. The electrode
+pads used during this test were later identified as old.
+
+### Fresh-Electrode Stationary Confirmation
+
+The original electrode pads were replaced with fresh pads.
+
+With all three electrodes connected:
+
+1. The system remained in `POOR_SIGNAL` for approximately three minutes.
+2. It then entered `ACQUIRING`.
+3. It reached `VALID` at approximately 3 minutes 30 seconds.
+4. It remained continuously `VALID` for the following ten minutes.
+
+This result suggested that degraded electrode contact contributed
+substantially to the instability observed during the original all-leads
+recovery test.
+
+### Fresh-Electrode All-Leads Recovery Repeat
+
+A targeted all-leads disconnection and recovery sequence was repeated
+using the fresh pads.
+
+#### Baseline and Disconnection
+
+1. The system remained continuously `VALID` for two minutes with all
+   three leads attached.
+2. All three leads were unsnapped.
+3. The system immediately entered `POOR_SIGNAL`.
+4. It remained in `POOR_SIGNAL` throughout the complete 60-second
+   disconnected observation.
+5. It never incorrectly entered `VALID`.
+
+#### Reconnection
+
+After all three leads were reattached:
+
+1. The system remained in `POOR_SIGNAL` for approximately 58 seconds.
+2. It began acquiring and nearly completed qualification.
+3. A one-second poor-signal event reset the qualification process.
+4. It subsequently reached `VALID` approximately 2 minutes 10 seconds
+   after reconnection.
+5. It remained valid until approximately the six-minute checkpoint.
+6. A brief poor-signal event occurred at six minutes.
+7. The system entered `ACQUIRING` and returned to `VALID` at
+   approximately 6 minutes 30 seconds.
+8. It remained continuously `VALID` from 6 minutes 30 seconds through
+   the 12-minute checkpoint.
+
+No complete freeze, unexpected restart, or manual reset occurred.
+
+#### Fresh-Electrode Repeat Result
+
+- All-three-disconnection rejection: **Pass**
+- Incorrect validation while disconnected: **No**
+- Recovery after reconnection: **Pass**
+- Transient rejection during recovery: **Pass**
+- Long-term post-reconnection stability: **Pass with one interruption**
+- Complete freeze or restart: **No**
+
+### Test 6 Analysis
+
+The protected sketch successfully rejected:
+
+- Complete three-lead disconnection
+- Green-lead disconnection throughout a ten-minute observation
+- Numerous brief artifacts
+- Unstable reacquisition attempts
+
+It also:
+
+- Cleared validation after poor-signal events
+- Required reacquisition before restoring BPM
+- Recovered automatically without a manual reset
+- Demonstrated substantially improved recovery with fresh electrode pads
+
+However, it returned to `VALID` while red or yellow remained
+disconnected. The software-only plausibility, filtering, and timing checks
+therefore cannot positively confirm physical attachment of every
+electrode.
+
+The fresh-pad tests demonstrated that electrode age and contact quality
+materially affected recovery stability.
+
+### Test 6 Result
+
+Test 6 received an overall result of:
+
+**PARTIAL PASS**
+
+#### Passed Behaviors
+
+- Complete disconnection immediately produced `POOR_SIGNAL`
+- Complete disconnection never reached `VALID`
+- Green disconnection did not reach `VALID` during ten minutes
+- Brief artifacts were rejected
+- Unstable acquiring attempts were reset
+- Reconnection recovery occurred automatically
+- Fresh-pad stationary operation remained valid for ten minutes
+- No persistent freeze occurred during the final repeat
+
+#### Remaining Limitations
+
+- Persistent red disconnection could reach `VALID`
+- Persistent yellow disconnection could reach `VALID`
+- Software filtering does not replace hardware lead-off detection
+- Signal reliability depends strongly on electrode condition
+- The system has not yet been validated during movement
+- Audio must remain disabled during `POOR_SIGNAL` and `ACQUIRING`
+
+The results support proceeding to controlled movement testing while
+retaining these documented limitations.
+
+The prototype remains experimental and is not intended for medical use.
+
+### Evidence Note
+
+Test 6 was documented through timed observations and the exact tested
+source code. Screenshots were not required or retained.
+
+The state-transition timings, recovery measurements, results tables, and
+protected sketch provide the test evidence.
