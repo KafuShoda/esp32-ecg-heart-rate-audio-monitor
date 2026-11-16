@@ -62,3 +62,15 @@ observations. No screenshots were retained for this test.
 
 The complete implementation and results are available in
 [`docs/phase-7-signal-reliability.md`](../../docs/phase-7-signal-reliability.md).
+
+## Test 6: Signal-Quality Protection Verification
+
+Test 6 was documented through timed observations and the tested
+signal-quality source code. No screenshots were retained.
+
+The test included individual red, yellow, and green disconnections,
+complete three-lead disconnection, reconnection recovery, a fresh-pad
+stationary confirmation, and a targeted fresh-pad recovery repeat.
+
+Detailed results are available in
+[`docs/phase-7-signal-reliability.md`](../../docs/phase-7-signal-reliability.md).
