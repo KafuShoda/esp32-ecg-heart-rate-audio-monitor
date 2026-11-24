@@ -989,3 +989,24 @@ source code. Screenshots were not required or retained.
 
 The state-transition timings, recovery measurements, results tables, and
 protected sketch provide the test evidence.
+
+## Test 7: Controlled Movement — Off-Body Cable Check
+
+All three electrode snaps were off-body on a wooden table. The
+`phase-7-signal-quality.ino` sketch was used to check whether gentle
+electrode-cable movement affected the prototype's behavior.
+
+| Condition | Observation window | Serial Monitor | OLED |
+|---|---|---|---|
+| Stationary baseline | 2 minutes | Continuous `POOR_SIGNAL` — `Invalid BPM/R-R` | `POOR SIGNAL` |
+| Trial 1: Bent the middle of the electrode cable | 1 minute after movement | Continuous `POOR_SIGNAL` — `Invalid BPM/R-R` | `POOR SIGNAL` |
+| Trial 2: Moved the cable jacket near the MAX30003 plug | 1 minute after movement | Continuous `POOR_SIGNAL` — `Invalid BPM/R-R` | `POOR SIGNAL` |
+| Trial 3: Moved the insulated leads near the snap ends | 1 minute after movement | Continuous `POOR_SIGNAL` — `Invalid BPM/R-R` | `POOR SIGNAL` |
+
+**Result:** Off-body bench check passed. No unexpected `VALID` state,
+serial interruption, or restart was observed during the baseline or
+the recorded post-movement windows. Behavior during the movements
+themselves was not separately logged.
+
+**Scope:** This check did not measure BPM accuracy or walking
+performance. Walking validation remains pending.
