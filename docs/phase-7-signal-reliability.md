@@ -1010,3 +1010,19 @@ themselves was not separately logged.
 
 **Scope:** This check did not measure BPM accuracy or walking
 performance. Walking validation remains pending.
+
+## Test 8: 30-Minute Bench Endurance
+
+The prototype ran for 30 minutes with all electrode snaps off-body
+using `phase-7-signal-quality.ino`.
+
+Serial Monitor continuously printed fresh
+`State: POOR_SIGNAL | Reason: Invalid BPM/R-R` lines throughout the
+run. The OLED displayed `POOR SIGNAL`. No serial interruption or
+unexpected `VALID` state was observed.
+
+**Result: PASS — off-body bench endurance.**
+
+This test demonstrated continuous reporting and rejection of off-body
+input for 30 minutes. It did not test sustained heart-rate tracking,
+BPM accuracy, or walking reliability.
